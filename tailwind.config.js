@@ -12,6 +12,6 @@ module.exports = {
       // Your custom theme extensions
     },
   },
-  darkMode: 'class',
+  
   plugins: [heroui()],
 };
