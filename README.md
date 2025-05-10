@@ -14,23 +14,112 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# 📰 SportsDunia
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+A dynamic sports news web app built using **Next.js**, powered by **Firebase Authentication**, **NewsData API**, and **Google Sheets API**. Authenticated users can view trending sports news and upload article payout data directly to a Google Sheet.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🚀 Features
 
-To learn more about Next.js, take a look at the following resources:
+- 🔐 Google Sign-in via Firebase
+- 🗞️ Fetches live sports news from NewsData.io
+- 📤 Upload curated payout data to a connected Google Sheet
+- 📱 Fully responsive UI built with Tailwind CSS
+- 🧠 Simple and clean dashboard UI
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠 Tech Stack
 
-## Deploy on Vercel
+- **Frontend:** Next.js (React-based)
+- **Styling:** Tailwind CSS
+- **Auth:** Firebase Authentication
+- **Data Source:** NewsData.io (`newsApi.ai`)
+- **Export:** Google Sheets API
+- **Environment:** Vercel + Local Dev (`.env.local`)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔧 Environment Setup
+
+Create a `.env.local` file at the root of your project and paste the following:
+
+```env
+# Firebase Configuration
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+
+# News API
+NEXT_PUBLIC_NEWS_API_KEY=
+
+# Google Sheets API
+NEXT_PUBLIC_GOOGLE_API_KEY=
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=
+NEXT_PUBLIC_SPREAD_SHEET_ID=
+```
+
+ Installation
+```
+# Clone the repository
+git clone https://github.com/yourusername/sportsdunia.git
+
+# Navigate into the directory
+cd sportsdunia
+
+# Install dependencies
+npm install
+```
+
+
+Running the App Locally
+```
+npm run dev
+```
+
+
+ Usage
+```
+Sign in using your Google account.
+
+Browse sports news fetched live from NewsData.io.
+
+Fill in the payout entries from the dashboard.
+
+Click "Upload" to push data into the connected Google Sheet.
+
+🧹 Old data is cleared before each new upload to ensure no duplication.
+```
+
+Project Structure
+```
+sportsdunia/
+├── app/
+│   ├── components/        # UI Components (e.g., Dashboard)
+│   ├── dashboard/         # Dashboard Logic and View
+│   └── page.tsx           # Home Page
+├── public/                # Static assets
+├── styles/                # Global styles
+├── utils/                 # API helpers, etc.
+├── .env.local             # Your private env vars
+├── README.md              # This file
+```
+
+🙏 Acknowledgements
+Firebase
+
+NewsData.io
+
+Google Sheets API
+
+Next.js
+
+TailwindCSS
+
+👤 Author
+Made with ❤️ by Rahul Compani
+
