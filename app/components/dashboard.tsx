@@ -1048,15 +1048,27 @@ const filteredNews = useMemo(() => {
 
               
             </motion.div>
-            <div className="flex justify-between"><Button onClick={openModal}>Open Payout Modal</Button>
-            {payouts.length > 0 && (
-        <div>
-          <Button onClick={downloadPDF}>Download PDF</Button>
-          <Button onClick={downloadCSV} className="ml-4">
-            Download CSV
-          </Button>
-        </div>
-      )}</div>
+            <div className="flex lg:flex-row flex-col sm:justify-between">
+  <Button onClick={openModal} className="w-full sm:w-auto mb-2 sm:mb-0">
+    Open Payout Modal
+  </Button>
+  {payouts.length > 0 && (
+    <div className="flex flex-col sm:flex-row sm:ml-4 mt-2 sm:mt-0">
+      <Button onClick={downloadPDF} className="mb-2 sm:mb-0 sm:mr-4 w-full sm:w-auto">
+        Download PDF
+      </Button>
+      <Button
+        onClick={downloadCSV}
+        className="w-full sm:w-auto sm:mt-0 mb-2 sm:mb-0"
+      >
+        Download CSV
+      </Button>
+    </div>
+  )}
+</div>
+
+
+
             
                <PayoutModal
         isOpen={isModalOpen}
@@ -1094,12 +1106,9 @@ const filteredNews = useMemo(() => {
                 <p className="text-slate-400 text-sm">Your daily news analytics</p>
               </div>
             </div>
-            <div className="text-slate-400 text-sm">© {new Date().getFullYear()} NewsInsight. All rights reserved.</div>
+          
           </div>
-          <Separator className="my-6 bg-slate-800" />
-          <div className="text-center text-slate-500 text-xs">
-            Powered by newsdata.io API. Data refreshed {new Date().toLocaleTimeString()}.
-          </div>
+          
         </div>
       </footer>
      
