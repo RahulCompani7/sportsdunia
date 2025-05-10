@@ -17,6 +17,7 @@ import Image from "next/image"
 import dynamic from "next/dynamic"
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { gapi } from "gapi-script";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false })
 
@@ -44,6 +45,11 @@ interface Payout {
   payout: number;
 }
 
+const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+const SPREADSHEET_ID = process.env.NEXT_PUBLIC_SPREAD_SHEET_ID;
+const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+
 export default function Dashboard() {
   const [state, setState] = useState<DashboardState>({
     news: [],
@@ -60,6 +66,73 @@ export default function Dashboard() {
 });
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [payouts, setPayouts] = useState<Payout[]>([]);
+const [isSignedIn, setIsSignedIn] = useState(false);
+
+// Initialize the Google API client
+  useEffect(() => {
+  if (typeof window !== "undefined") {
+    const initClient = () => {
+      gapi.client
+        .init({
+          apiKey: API_KEY,
+          clientId: CLIENT_ID,
+          discoveryDocs: [
+            "https://sheets.googleapis.com/$discovery/rest?version=v4",
+          ],
+          scope: SCOPES,
+        })
+        .then(() => {
+          const authInstance = gapi.auth2.getAuthInstance();
+          setIsSignedIn(authInstance.isSignedIn.get());
+        });
+    };
+
+    gapi.load("client:auth2", initClient);
+  }
+}, []);
+
+
+  // Sign in button
+  const handleSignIn = () => {
+    gapi.auth2.getAuthInstance().signIn().then(() => {
+      setIsSignedIn(true);
+    });
+  };
+
+  // Upload payouts to Google Sheets
+  const uploadToSheet = async () => {
+    if (!isSignedIn) return alert("Please sign in first!");
+
+    // Prepare values (headers + rows)
+    const csvRows = payouts.map((payout) => [
+      (payout.creator ?? ["Unknown Author"]).join(", "),
+      payout.title ?? "Untitled Article",
+      payout.payout,
+    ]);
+
+    const values = [["Author", "Article", "Payout (₹)"], ...csvRows];
+
+    try {
+       // Step 1: Clear existing data
+      await gapi.client.sheets.spreadsheets.values.clear({
+        spreadsheetId: SPREADSHEET_ID,
+        range: "Sheet1!A1:Z1000", // Adjust the range as needed
+      });
+
+      // Step 2: Insert new data
+      await gapi.client.sheets.spreadsheets.values.update({
+        spreadsheetId: SPREADSHEET_ID,
+        range: "Sheet1!A1", // Start from the first cell
+        valueInputOption: "USER_ENTERED",
+        resource: { values },
+      });
+
+      alert("✅ Data uploaded to Google Sheet!");
+    } catch (err) {
+      console.error("❌ Upload failed:", err);
+      alert("❌ Failed to upload data. See console for details.");
+    }
+  };
 
 const filteredNews = useMemo(() => {
   return state.news.filter((article) => {
@@ -1053,6 +1126,7 @@ const filteredNews = useMemo(() => {
     Open Payout Modal
   </Button>
   {payouts.length > 0 && (
+    <>
     <div className="flex flex-col sm:flex-row sm:ml-4 mt-2 sm:mt-0">
       <Button onClick={downloadPDF} className="mb-2 sm:mb-0 sm:mr-4 w-full sm:w-auto">
         Download PDF
@@ -1064,8 +1138,24 @@ const filteredNews = useMemo(() => {
         Download CSV
       </Button>
     </div>
+     <div className="space-y-2">
+      {!isSignedIn && (
+        <button onClick={handleSignIn} className="bg-blue-600 text-white px-4 py-2 rounded">
+          Sign in with Google
+        </button>
+      )}
+      <button
+        onClick={uploadToSheet}
+        className="bg-green-600 text-white px-4 py-2 rounded"
+        disabled={!isSignedIn}
+      >
+        Upload to Google Sheets
+      </button>
+    </div>
+    </>
   )}
 </div>
+
 
 
 
