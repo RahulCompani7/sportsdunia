@@ -38,7 +38,7 @@ export default function dashboard() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-background to-muted/50 dark:from-background dark:to-background/80">
-      <header className="container flex h-16 items-center justify-between px-4 bg-white/30 backdrop-blur-md shadow-md">
+      <header className="container flex h-16 items-center justify-between px-4 bg-white/30 backdrop-blur-md shadow-md dark:bg-black">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

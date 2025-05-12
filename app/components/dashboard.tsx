@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo,useRef } from "react"
 import axios from "axios"
 import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,14 +10,12 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 import { BarChart, LineChart, PieChart } from "lucide-react"
 import PayoutModal from "./payoutModal"
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { gapi } from "gapi-script";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false })
 
@@ -67,37 +65,44 @@ export default function Dashboard() {
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [payouts, setPayouts] = useState<Payout[]>([]);
 const [isSignedIn, setIsSignedIn] = useState(false);
+ const gapiRef = useRef<any>(null);
 
 // Initialize the Google API client
   useEffect(() => {
-  if (typeof window !== "undefined") {
-    const initClient = () => {
-      gapi.client
-        .init({
-          apiKey: API_KEY,
-          clientId: CLIENT_ID,
-          discoveryDocs: [
-            "https://sheets.googleapis.com/$discovery/rest?version=v4",
-          ],
-          scope: SCOPES,
-        })
-        .then(() => {
-          const authInstance = gapi.auth2.getAuthInstance();
-          setIsSignedIn(authInstance.isSignedIn.get());
-        });
-    };
+  const loadGapi = async () => {
+    if (typeof window !== "undefined") {
+      const { gapi } = await import("gapi-script");
 
-    gapi.load("client:auth2", initClient);
-  }
+      const initClient = () => {
+        gapi.client
+          .init({
+            apiKey: API_KEY,
+            clientId: CLIENT_ID,
+            discoveryDocs: [
+              "https://sheets.googleapis.com/$discovery/rest?version=v4",
+            ],
+            scope: SCOPES,
+          })
+          .then(() => {
+            const authInstance = gapi.auth2.getAuthInstance();
+            setIsSignedIn(authInstance.isSignedIn.get());
+          });
+      };
+
+      gapi.load("client:auth2", initClient);
+    }
+  };
+
+  loadGapi();
 }, []);
 
 
   // Sign in button
   const handleSignIn = () => {
-    gapi.auth2.getAuthInstance().signIn().then(() => {
-      setIsSignedIn(true);
-    });
-  };
+  gapiRef.current.auth2.getAuthInstance().signIn().then(() => {
+    setIsSignedIn(true);
+  });
+};
 
   // Upload payouts to Google Sheets
   const uploadToSheet = async () => {
@@ -111,6 +116,8 @@ const [isSignedIn, setIsSignedIn] = useState(false);
     ]);
 
     const values = [["Author", "Article", "Payout (₹)"], ...csvRows];
+
+    const gapi = gapiRef.current;
 
     try {
        // Step 1: Clear existing data
